@@ -5,6 +5,8 @@ from string import ascii_uppercase as alphabet
 if __name__ == '__main__':
     spark = SparkSession.builder.appName("BDA Project").getOrCreate()
 
+    print("=============================PREPARE DATA=============================")
+
     # DAILY
     schema_daily = StructType(
         fields=[
@@ -21,7 +23,7 @@ if __name__ == '__main__':
 
     # daily_dataset_df = spark.read.csv("dataset/daily_dataset/daily_dataset/*", header=True, schema=schema_daily).persist()
     daily_dataset_df = spark.read.csv("dataset/daily_dataset/daily_dataset/block_0.csv", header=True, schema=schema_daily).persist()
-    daily_dataset_df.createOrReplaceTempView("daily_dataset")
+    daily_dataset_df.createOrReplaceTempView("daily")
     print("Daily dataset ex:", daily_dataset_df.head())
     print("Number of rows:", daily_dataset_df.count())
 
@@ -34,7 +36,7 @@ if __name__ == '__main__':
         ])
     # halfhourly_dataset_df = spark.read.csv("dataset/halfhourly_dataset/halfhourly_dataset/*", header=True, schema=schema_halfhourly).persist()
     halfhourly_dataset_df = spark.read.csv("dataset/halfhourly_dataset/halfhourly_dataset/block_0.csv", header=True, schema=schema_halfhourly).persist()
-    halfhourly_dataset_df.createOrReplaceTempView("halfhourly_dataset")
+    halfhourly_dataset_df.createOrReplaceTempView("halfhourly")
     print("Halfhourly dataset ex:", halfhourly_dataset_df.head())
     print("Number of rows:", halfhourly_dataset_df.count())
 
@@ -45,7 +47,7 @@ if __name__ == '__main__':
     schema_hh = StructType(fields=fields)
     # hh_dataset_df = spark.read.csv("dataset/hhblock_dataset/hhblock_dataset/*", header=True, schema=schema_hh).persist()
     hh_dataset_df = spark.read.csv("dataset/hhblock_dataset/hhblock_dataset/block_0.csv", header=True, schema=schema_hh).persist()
-    hh_dataset_df.createOrReplaceTempView("hh_dataset")
+    hh_dataset_df.createOrReplaceTempView("hhblock")
     print("HH block dataset ex:", hh_dataset_df.head())
     print("Number of rows:", hh_dataset_df.count())
 
@@ -62,3 +64,20 @@ if __name__ == '__main__':
     acorn_dataset_df.createOrReplaceTempView("acorn_details")
     print("ACORN DETAILS dataset ex:", acorn_dataset_df.head())
     print("Number of rows:", acorn_dataset_df.count())
+
+    # INFORMATIONS HOUSEHOLDS
+    schema_informations_households = StructType(
+        fields=[
+            StructField("LCLid", StringType(), True),
+            StructField("stdorToU", StringType(), True),
+            StructField("Acorn", StringType(), True),
+            StructField("Acorn_grouped", StringType(), True),
+            StructField("file", StringType(), True)
+        ])
+    inf_households_dataset_df = spark.read.csv("dataset/informations_households.csv", header=True, schema=schema_informations_households).persist()
+    inf_households_dataset_df.createOrReplaceTempView("inf_households")
+    print("Informations households dataset ex:", inf_households_dataset_df.head())
+    print("Number of rows:", inf_households_dataset_df.count())
+
+    print("=============================ANALYZE DATA=============================")
+    print("Number of unique houses:", daily_dataset_df.groupBy('LCLid').count().show())
